@@ -256,5 +256,4 @@ let request = {
     }
 };
 
-
 extension.init();
