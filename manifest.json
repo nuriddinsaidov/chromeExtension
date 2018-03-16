@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "autotoolza extension",
+  "description": "autotoolza extension for  interaction with lv web pages.",
+  "version": "1.0",
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.leadvertex.ru/admin/order/new.html",
+        "http://*.leadvertex.ru/admin/order/new.html",
+        "https://*.leadvertex.ru/admin/order-*.html",
+        "http://*.leadvertex.ru/admin/order-*.html"
+      ],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ]
+}
