@@ -66,15 +66,14 @@ var extension = {
             '                <div id="goods">';
         let increament = 0;
         element.list.payload.forEach(function (item) {
-
+            let value = item.is_kit > 0 ? item.goods_included : item.good_id;
             htmlCollect += '<div class="row-fluid">' +
                 '                        <div>' +
                 '                            <label>' +
                 '                               ' +
                 '                               <input data-is_kit="' + item.is_kit + '" ' +
-                '                               data-goods_included="' + item.goods_included + '" ' +
                 '                               class="goods-checkbox" name="Order[goods][' + increament + '][goodID]" ' +
-                '                               id="' + item.good_id + '" value="' + item.good_id + '" type="checkbox">' +
+                '                               id="' + item.good_id + '" value="' + value + '" type="checkbox">' +
                 '                                <b>' + item.good_name + ': ' + (item.purchasingPrice ? item.purchasingPrice : "")
                                                 + ' </b>' +
                 '                            </label>' +
@@ -82,7 +81,6 @@ var extension = {
                 '                    </div>';
             increament++;
         });
-        increament=0;
         htmlCollect += '</div></div></div></div>';
         elChild.innerHTML = htmlCollect;
         el.insertBefore(elChild, el.firstChild);
