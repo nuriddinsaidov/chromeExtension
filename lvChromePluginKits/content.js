@@ -41,7 +41,7 @@ let extension = {
             makeOrder.addEventListener('click', request.manageOrder, false);
         }
 
-        // element.remove("accordionGoods",'id');
+        element.remove("accordionGoods",'id');
     },
 
     insertAfter: function(el, referenceNode) {
