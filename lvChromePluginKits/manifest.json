@@ -15,8 +15,8 @@
       "matches": [
         "https://*.leadvertex.ru/admin/order/new.html",
         "http://*.leadvertex.ru/admin/order/new.html",
-        "https://*.leadvertex.ru/admin/order-*.html",
-        "http://*.leadvertex.ru/admin/order-*.html"
+        "https://*.leadvertex.ru/admin/order-*.html*",
+        "http://*.leadvertex.ru/admin/order-*.html*"
       ],
       "js": ["content.js"],
       "css": ["style.css"]

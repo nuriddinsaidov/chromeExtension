@@ -1,24 +1,16 @@
-var extension = {
+let extension = {
     offer:'',
     apiLink: 'https://tools.dev.autotovarka.ru',
     orderViewlink: 'https://{offer}.leadvertex.ru/admin/order-{orderId}.html',
+    url: window.location.href,
+
     init: function () {
 
-        var url = window.location.href;
 
-        if(url.indexOf('order/new.html') !== -1) {
-
+        if(extension.url.indexOf('order/new.html') !== -1 || extension.url.indexOf('admin/order-') !== -1) {
             element.remove("save-changes",'class');
-            element.remove("accordionGoods",'id');
-
-            element.create("button");
-
-            var makeOrder = document.getElementById("make-order");
-            makeOrder.addEventListener("click", request.addOrder, false);
 
             this.offer = window.location.hostname.split('.')[0];
-
-
 
             request.get({
                 name: 'goods',
@@ -34,12 +26,28 @@ var extension = {
                 method: 'getKitsByOffer',
 
             });
-            return true;
         }
+
+        if(extension.url.indexOf('admin/order-') !== -1) {
+            element.create("button",'updateOrder');
+            let makeOrder = document.getElementById("updateOrder");
+            makeOrder.addEventListener('click', request.manageOrder, false);
+            goodData.collect();
+        }
+
+        if(extension.url.indexOf('order/new.html') !== -1) {
+            element.create("button",'addOrder');
+            let makeOrder = document.getElementById("addOrder");
+            makeOrder.addEventListener('click', request.manageOrder, false);
+        }
+
+        // element.remove("accordionGoods",'id');
     },
-    insertAfter(el, referenceNode) {
+
+    insertAfter: function(el, referenceNode) {
         referenceNode.parentNode.insertBefore(el, referenceNode.nextSibling);
     },
+
     createMessageBlock: function () {
         let el = document.getElementsByClassName('navbar-fixed-top')[0], htmlCollect,
             elChild = document.createElement("div");
@@ -50,6 +58,7 @@ var extension = {
         elChild.innerHTML = htmlCollect;
         extension.insertAfter(elChild, el.firstChild);
     },
+
     createElement: function (element) {
 
         let el = document.getElementById('accordionSMS'), htmlCollect,
@@ -64,22 +73,25 @@ var extension = {
             '<div id="collapse' + element.className + '" class="accordion-body collapse" style="height: 0px;">' +
             '            <div class="accordion-inner">\n' +
             '                <div id="goods">';
-        let increament = 0;
         element.list.payload.forEach(function (item) {
             let value = item.is_kit > 0 ? item.goods_included : item.good_id;
+            let price = item.price > 0 ? item.price : 0;
+            let quantity = item.quantity > 0 ? item.quantity : 1;
             htmlCollect += '<div class="row-fluid">' +
                 '                        <div>' +
                 '                            <label>' +
                 '                               ' +
                 '                               <input data-is_kit="' + item.is_kit + '" ' +
-                '                               class="goods-checkbox" name="Order[goods][' + increament + '][goodID]" ' +
+                '                               class="goods-checkbox" name="Order[goods][' + value + '][goodID]" ' +
                 '                               id="' + item.good_id + '" value="' + value + '" type="checkbox">' +
-                '                                <b>' + item.good_name + ': ' + (item.purchasingPrice ? item.purchasingPrice : "")
-                                                + ' </b>' +
+                '                                <b>' + item.good_name + ' </b>' +
                 '                            </label>' +
+                'Кол: <input class="goods-count" type="number" name="Order[goods][' + value + '][quantity]" value="' +
+                quantity + '"> <br>' +
+                'Сум: <input class="goods-price" type="text" name="Order[goods][' + value + '][price]" value="' +
+                price + '">' +
                 '                        </div>' +
                 '                    </div>';
-            increament++;
         });
         htmlCollect += '</div></div></div></div>';
         elChild.innerHTML = htmlCollect;
@@ -88,12 +100,30 @@ var extension = {
 };
 
 let element = {
-    create:function(type) {
-            ordersform = document.getElementById("orders-form"),
-            elChild = document.createElement("div");
+
+    create:function(type, select='addOrder') {
+
+        let elChild = document.createElement("div"),
+        text = 'Создать заказ', orderNumber = '', htmlCollect = '', makeElement = '';
+
+        if(select === 'addOrder') {
+          makeElement = document.getElementById("orders-form");
+        }
+
+        if(select === 'updateOrder') {
+          makeElement = document.getElementsByClassName("order-number")[0];
+          elChild.style.display = 'inline-block';
+          orderNumber = makeElement.innerHTML;
+          makeElement.innerHTML = '';
+          text = 'Сохранить заказ';
+        }
 
         if(type === 'button') {
-            htmlCollect = '<div class="btn btn-primary save-changes" id="make-order">Создать заказ</div> ';
+            htmlCollect = '<div class="btn btn-primary save-changes" id="' + select + '">' + text + '</div> ';
+        }
+
+        if(orderNumber!=='') {
+            htmlCollect = orderNumber + ' ' + htmlCollect;
         }
 
         if(type === "loader"){
@@ -101,11 +131,13 @@ let element = {
         }
 
         elChild.innerHTML = htmlCollect;
-        ordersform.insertBefore(elChild, ordersform.firstChild);
+        makeElement.insertBefore(elChild, makeElement.firstChild);
+
     },
+
     remove: function (name,type) {
 
-        var elementToRemove ='';
+        let elementToRemove ='';
 
         if(type === 'id') {
             elementToRemove  = document.getElementById(name);
@@ -117,6 +149,7 @@ let element = {
 
         return elementToRemove.parentNode.removeChild(elementToRemove);
     },
+
     switchIt:function (from, to) {
 
         if(from === 'button') {
@@ -136,9 +169,11 @@ let element = {
         }
 
     },
+
     hide:function (name) {
         document.getElementsByClassName(name)[0].style.display = 'none';
     },
+
     show:function (name) {
         let getElement = document.getElementsByClassName(name)[0];
         if(getElement) {
@@ -150,6 +185,7 @@ let element = {
 };
 
 let request = {
+    collectionResponse:'',
     token: 'dSkKLktYUPZ%o346{PGTYiOpldow83s',
     get: function (addBlock) {
         let param = this.makeParam({
@@ -165,13 +201,13 @@ let request = {
             xhr.open('GET', extension.apiLink + '/app.php?' + param);
             xhr.onload = function () {
                 if (xhr.status === 200) {
-                    let response = JSON.parse(xhr.responseText);
-                    if (response.success) {
+                    request.collectionResponse = JSON.parse(xhr.responseText);
+                    if (request.collectionResponse.success) {
                         extension.createElement({
                             className: addBlock.name,
                             title: addBlock.title,
                             name: addBlock.name,
-                            list: response
+                            list: request.collectionResponse
                         });
                         resolve(addBlock.name);
                     }
@@ -184,12 +220,23 @@ let request = {
 
         });
     },
-    addOrder: function () {
-        var orderForm = document.getElementById("orders-form");
-        formData = new FormData(orderForm);
+
+    manageOrder: function () {
+        let orderForm = document.getElementById("orders-form");
+        let formData = new FormData(orderForm);
+        let sendMethod = null;
+
+        if(extension.url.indexOf('order/new.html') !== -1){
+            sendMethod = 'addOrder';
+        }
+
+        if(extension.url.indexOf('admin/order-') !== -1) {
+            sendMethod = 'updateOrder';
+        }
+
         let param = request.makeParam({
-            token: this.token,
-            method: 'addOrder',
+            token: request.token,
+            method: sendMethod,
             params: {
                 offerName: extension.offer
             }
@@ -199,10 +246,12 @@ let request = {
             let xhr = new XMLHttpRequest();
             xhr.open('POST', extension.apiLink + '/lvApi.php?' + param);
             xhr.onload = function () {
+
                 element.switchIt("button","loader");
+
                 if (xhr.status === 200) {
 
-                    if(xhr.responseText === 'error'){
+                    if(xhr.responseText === 'error' || xhr.responseText === ''){
                         element.switchIt("loader","button");
                         return alert('заказ не может быть добавлен, попробуйте снова через некоторое время');
                     }
@@ -212,8 +261,7 @@ let request = {
 
                     if (response > 0) {
                         let changed = extension.orderViewlink.replace('{offer}', extension.offer);
-                        let redirectUrl = changed.replace('{orderId}', response);
-                        window.location.href = redirectUrl;
+                        window.location.href = changed.replace('{orderId}', response);
                     }else{
                         alert('Проблемы при сохранении товара');
                         element.switchIt("loader","button");
@@ -229,6 +277,7 @@ let request = {
         });
        // element.switchIt("loader","button");
     },
+
     makeParam: function (object) {
         let encodedString = '';
         for (let prop in object) {
@@ -252,6 +301,32 @@ let request = {
         }
         return encodedString.replace(/%5B/g, '[').replace(/%5D/g, ']');
     }
+};
+
+let goodData = {
+    collect: function(){
+        let goodId = [ ];
+
+        let goods = document.querySelectorAll('#goods input[type="checkbox"]:checked');
+        console.log(goods.length);
+        if(goods.length > 0) {
+            console.log(request.collectionResponse);
+        }
+        for (let i = 0, len = goods.length; i < len; i++) {
+            let getGoodId = goods[i].name.
+                            replace('OrderGood[','').
+                            replace('][isChecked]','');
+                goodId.push(
+                    getGoodId
+                );
+                goodId[getGoodId] = [];
+                goodId[getGoodId]['price'] = 1;
+                goodId[getGoodId]['quantity'] = 1;
+            }
+            console.log(goodId);
+
+        return true;
+        }
 };
 
 extension.init();

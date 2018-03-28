@@ -18,3 +18,7 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.goods-count, .goods-price {
+    width:50px;
+}
