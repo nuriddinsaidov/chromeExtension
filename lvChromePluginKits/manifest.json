@@ -3,7 +3,7 @@
   "name": "autotoolza extension",
   "description": "autotoolza extension for  interaction with lv web pages.",
   "version": "1.0",
-  "browser_action": {
+  "page_action": {
     "default_icon": "icon.png"
   },
   "permissions": [
@@ -19,7 +19,15 @@
         "http://*.leadvertex.ru/admin/order-*.html*"
       ],
       "js": ["content.js"],
-      "css": ["style.css"]
+      "css": ["style.css"],
+      "run_at": "document_end"
     }
+  ],
+  "web_accessible_resources": [
+    "main.js",
+    "/modules/model.js",
+    "/modules/view.js",
+    "/modules/config.js"
   ]
+
 }
