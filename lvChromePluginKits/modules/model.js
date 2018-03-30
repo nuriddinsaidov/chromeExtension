@@ -37,7 +37,7 @@ let request = {
             params: {
                 offerName: leadvertex.offer
             },
-            id:element.orderId.replace(/[^0-9]/g, '')
+            id:element.orderId()
 
         });
     },

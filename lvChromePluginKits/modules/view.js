@@ -1,7 +1,7 @@
 let element = {
     orderId:function () {
         let getOrder = document.getElementsByClassName("order-number")[0];
-        return getOrder.replace(/[^0-9]/g, '');
+        return getOrder.innerHTML.replace(/[^0-9]/g, '');
     },
     create:function(type, select='addOrder') {
 
