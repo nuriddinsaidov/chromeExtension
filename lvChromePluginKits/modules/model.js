@@ -6,19 +6,11 @@ import {element} from './view.js';
 
 let request = {
     get: function (addBlock) {
-
-        let param = this.makeParam({
-            token: leadvertex.token,
-            method: addBlock.method,
-            params: {
-                offerName: leadvertex.offer
-            }
-        });
-
+        console.log(request.sendParamData());
         return new Promise((resolve, reject) => {
 
             let xhr = new XMLHttpRequest();
-            xhr.open('GET', leadvertex.link + '/app.php?' + param);
+            xhr.open('GET', leadvertex.link + '/app.php?' + request.sendParamData(addBlock.method));
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     let JSONresponse = JSON.parse(xhr.responseText);
@@ -38,24 +30,25 @@ let request = {
         });
 
     },
-
-    manageOrder: function () {
-        console.log(element.orderId);
-        let orderForm = document.getElementById("orders-form");
-        let formData = new FormData(orderForm);
-
-        let param = request.makeParam({
+    sendParamData:function (setMethod) {
+        return this.makeParam({
             token: leadvertex.token,
-            method: pageConfig.getAction(),
+            method: setMethod,
             params: {
                 offerName: leadvertex.offer
             },
-            id:element.orderId
+            id:element.orderId.replace(/[^0-9]/g, '')
+
         });
+    },
+    manageOrder: function () {
+        console.log(request.sendParamData());
+        let orderForm = document.getElementById("orders-form");
+        let formData = new FormData(orderForm);
 
         return new Promise((resolve, reject) => {
             let xhr = new XMLHttpRequest();
-            xhr.open('POST', leadvertex.link + '/lvApi.php?' + param);
+            xhr.open('POST', leadvertex.link + '/lvApi.php?' + request.sendParamData(pageConfig.getAction()));
             xhr.onload = function () {
 
                 element.switchIt("button","loader");
@@ -115,4 +108,31 @@ let request = {
     }
 };
 
-export {request};
+
+let goodData = {
+    collect: function(){
+        let goodId = [ ];
+
+        let goods = document.querySelectorAll('#goods input[type="checkbox"]:checked');
+        console.log(goods.length);
+        if(goods.length > 0) {
+            console.log(request.collectionResponse);
+        }
+        for (let i = 0, len = goods.length; i < len; i++) {
+            let getGoodId = goods[i].name.
+            replace('OrderGood[','').
+            replace('][isChecked]','');
+            goodId.push(
+                getGoodId
+            );
+            goodId[getGoodId] = [];
+            goodId[getGoodId]['price'] = 1;
+            goodId[getGoodId]['quantity'] = 1;
+        }
+        console.log(goodId);
+
+        return true;
+    }
+};
+
+export {request, goodData};

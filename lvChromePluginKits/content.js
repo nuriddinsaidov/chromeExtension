@@ -303,31 +303,6 @@ let request = {
     }
 };
 
-let goodData = {
-    collect: function(){
-        let goodId = [ ];
-
-        let goods = document.querySelectorAll('#goods input[type="checkbox"]:checked');
-        console.log(goods.length);
-        if(goods.length > 0) {
-            console.log(request.collectionResponse);
-        }
-        for (let i = 0, len = goods.length; i < len; i++) {
-            let getGoodId = goods[i].name.
-                            replace('OrderGood[','').
-                            replace('][isChecked]','');
-                goodId.push(
-                    getGoodId
-                );
-                goodId[getGoodId] = [];
-                goodId[getGoodId]['price'] = 1;
-                goodId[getGoodId]['quantity'] = 1;
-            }
-            console.log(goodId);
-
-        return true;
-        }
-};
 
 //extension.init();
 const injectMain = () => {

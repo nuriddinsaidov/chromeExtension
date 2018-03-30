@@ -1,9 +1,12 @@
 let element = {
-    orderId:'',
+    orderId:function () {
+        let getOrder = document.getElementsByClassName("order-number")[0];
+        return getOrder.replace(/[^0-9]/g, '');
+    },
     create:function(type, select='addOrder') {
 
         let elChild = document.createElement("div"),
-            text = 'Создать заказ', orderNumber = '', htmlCollect = '', makeElement = '';
+            text = 'Создать заказ', orderNumber = '', htmlCollect = '', makeElement = '', orderId = '';
 
         if(select === 'addOrder') {
             makeElement = document.getElementById("orders-form");
@@ -12,7 +15,7 @@ let element = {
         if(select === 'updateOrder') {
             makeElement = document.getElementsByClassName("order-number")[0];
             elChild.style.display = 'inline-block';
-            element.orderId = makeElement.innerHTML;
+            orderId = makeElement.innerHTML;
             makeElement.innerHTML = '';
             text = 'Сохранить заказ';
         }
@@ -21,8 +24,8 @@ let element = {
             htmlCollect = '<div class="btn btn-primary save-changes" id="' + select + '">' + text + '</div> ';
         }
 
-        if(element.orderId!=='') {
-            htmlCollect = element.orderId + ' ' + htmlCollect;
+        if(orderId!=='') {
+            htmlCollect = orderId + ' ' + htmlCollect;
         }
 
         if(type === "loader"){
@@ -103,10 +106,10 @@ let element = {
         htmlCollect = '<div class="accordion-group">' +
             ' <div class="accordion-heading">\n' +
             '            <a class="accordion-toggle collapsed" data-toggle="collapse"' +
-            '            data-parent="#accordion" href="#collapse">\n' +
+            '            data-parent="#accordion' + element.config.name + '" href="#collapse' + element.config.name + '">\n' +
             '               ' + element.config.title + '           </a>\n' +
             '        </div>' +
-            '<div id="collapse" class="accordion-body collapse" style="height: 0px;">' +
+            '<div id="collapse' + element.config.name + '" class="accordion-body collapse" style="height: 0px;">' +
             '            <div class="accordion-inner">\n' +
             '                <div id="goods">';
 

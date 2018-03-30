@@ -26,7 +26,7 @@ const pageConfig = {
 
 
 const leadvertex = {
-    token: 'dSkKLktYUPZ%o346{PGTYiOpldow83s',
+    token:'dSkKLktYUPZ%o346{PGTYiOpldow83s',
     offer: window.location.hostname.split('.')[0],
     link:'https://tools.dev.autotovarka.ru',
     orderViewlink: 'https://{offer}.leadvertex.ru/admin/order-{orderId}.html',

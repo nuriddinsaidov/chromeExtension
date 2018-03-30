@@ -30,7 +30,7 @@ let init = {
         element.create("button",pageConfig.getAction());
         let makeOrder = document.getElementById(pageConfig.getAction());
         makeOrder.addEventListener('click', request.manageOrder, false);
-        element.remove("accordionGoods",'id');
+        //element.remove("accordionGoods",'id');
         return this;
     }
 };
@@ -38,9 +38,3 @@ let init = {
 init.
     goodHandler().
     viewHandler();
-
-//
-
-
-console.log(request.token);
-//console.log(element.token);
