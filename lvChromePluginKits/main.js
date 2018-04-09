@@ -1,40 +1,49 @@
 import {request} from './modules/model.js';
-import {
-        goodConfig,
-        collectionConfig,
-        pageConfig
-} from './modules/config.js';
+import {config} from './modules/config.js';
 import {element} from './modules/view.js';
 
-console.log(pageConfig.getAction());
+console.log(config);
 
 let init = {
-    goodHandler: function () {
+        goodHandler: function () {
 
-        request.get(goodConfig).then(function(value) {
-            element.createBlock(value);
-        }, function(reason) {
-            console.log(reason); // Ошибка!
-        });
+            request.send('GET', config).then(function (value) {
+                element.createBlock(value, config);
+            }, function (reason) {
+                console.log(reason); // Ошибка!
+            });
 
-        request.get(collectionConfig).then(function(value) {
-            element.createBlock(value);
-        }, function(reason) {
-            console.log(reason); // Ошибка!
-        });
-        return this;
-    },
-    viewHandler: function () {
+            return this;
+        },
+        viewHandler: function () {
 
-        element.remove("save-changes",'class');
-        element.create("button",pageConfig.getAction());
-        let makeOrder = document.getElementById(pageConfig.getAction());
-        makeOrder.addEventListener('click', request.manageOrder, false);
-        //element.remove("accordionGoods",'id');
-        return this;
-    }
-};
+            element.remove("save-changes", 'class');
+            element.create("button", config.getAction);
+            let makeOrder = document.getElementById(config.getAction);
+            makeOrder.addEventListener('click', function () {
+                config.leadvertex.request.method = 'manageLvByExtension';
+                let orderForm = document.getElementById("orders-form");
+                config.leadvertex.postData = new FormData(orderForm);
 
-init.
-    goodHandler().
-    viewHandler();
+
+                request.send('POST', config).then(function (value) {
+
+                    if (value > 0 && value.payload === true) {
+                        window.location.href = config.leadvertex.orderViewlink.replace('{offer}', config.leadvertex.offer).replace('{orderId}', value);
+                    }
+                    else if (value.payload !== true) {
+                        console.log(value);
+                    }
+
+                }, function (reason) {
+                    console.log(reason); // Ошибка!
+                });
+            });
+
+            element.remove("accordionGoods", 'id');
+            return this;
+
+        }
+    };
+
+init.goodHandler().viewHandler();

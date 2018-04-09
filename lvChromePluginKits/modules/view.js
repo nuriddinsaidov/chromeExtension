@@ -98,33 +98,33 @@ let element = {
         this.insertAfter(elChild, el.firstChild);
     },
 
-    createBlock: function (element) {
+    createBlock: function (item, config) {
 
-        let el = document.getElementById('accordionSMS'), htmlCollect,
+        for(let k in item.payload) {
+            element.putHtmlElement(config[k], item.payload[k]);
+        }
+
+    },
+    putHtmlElement: function (config, item) {
+
+        let el = document.getElementById('accordionSMS'), htmlCollect='', accordionStatus='0px',
             elChild = document.createElement("div");
 
-        htmlCollect = '<div class="accordion-group">' +
-            ' <div class="accordion-heading">\n' +
-            '            <a class="accordion-toggle collapsed" data-toggle="collapse"' +
-            '            data-parent="#accordion' + element.config.name + '" href="#collapse' + element.config.name + '">\n' +
-            '               ' + element.config.title + '           </a>\n' +
-            '        </div>' +
-            '<div id="collapse' + element.config.name + '" class="accordion-body collapse" style="height: 0px;">' +
-            '            <div class="accordion-inner">\n' +
-            '                <div id="goods">';
 
-        element.payload.forEach(function (item) {
-            let value = item.is_kit > 0 ? item.goods_included : item.good_id;
-            let price = item.price > 0 ? item.price : 0;
-            let quantity = item.quantity > 0 ? item.quantity : 1;
+        for(let goodID in item) {
+
+            let checked = item[goodID].selected ? 'checked' :'';
+            let value = config.name === 'goods' ? goodID : item[goodID].goods_included;
+            let price = item[goodID].price > 0 ? item[goodID].price : 0;
+            let quantity = item[goodID].quantity > 0 ? item[goodID].quantity : 1;
             htmlCollect += '<div class="row-fluid">' +
                 '                        <div>' +
                 '                            <label>' +
                 '                               ' +
-                '                               <input data-is_kit="' + item.is_kit + '" ' +
-                '                               class="goods-checkbox" name="Order[goods][' + value + '][goodID]" ' +
-                '                               id="' + item.good_id + '" value="' + value + '" type="checkbox">' +
-                '                                <b>' + item.good_name + ' </b>' +
+                '                               <input ' +
+                '                               class="goods-checkbox" ' + checked + ' name="Order[goods][' + value + '][goodID]" ' +
+                '                               id="' + item[goodID].good_id + '" value="' + value + '" type="checkbox">' +
+                '                                <b>' + item[goodID].good_name + ' </b>' +
                 '                            </label>' +
                 'Кол: <input class="goods-count" type="number" name="Order[goods][' + value + '][quantity]" value="' +
                 quantity + '"> <br>' +
@@ -132,7 +132,22 @@ let element = {
                 price + '">' +
                 '                        </div>' +
                 '                    </div>';
-        });
+            if(accordionStatus === '0px' && item[goodID].selected) {
+                accordionStatus = 'auto';
+            }
+
+        }
+
+        htmlCollect = '<div class="accordion-group">' +
+            ' <div class="accordion-heading">\n' +
+            '            <a class="accordion-toggle collapsed" data-toggle="collapse"' +
+            '            data-parent="#accordion' + config.name + '" href="#collapse' + config.name + '">\n' +
+            '               ' + config.title + '           </a>\n' +
+            '        </div>' +
+            '<div id="collapse' + config.name + '" class="accordion-body collapse" style="height: ' + accordionStatus + ';">' +
+            '            <div class="accordion-inner">\n' +
+            '                <div id="goods">' + htmlCollect;
+
         htmlCollect += '</div></div></div></div>';
         elChild.innerHTML = htmlCollect;
         el.insertBefore(elChild, el.firstChild);
